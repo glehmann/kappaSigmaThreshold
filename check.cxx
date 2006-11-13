@@ -1,6 +1,5 @@
 #include "itkImageFileReader.h"
 #include "itkImageFileWriter.h"
-#include "itkCommand.h"
 #include "itkSimpleFilterWatcher.h"
 
 #include "itkKappaSigmaThresholdImageFilter.h"
@@ -11,8 +10,8 @@ int main(int argc, char * argv[])
 
   if( argc != 5 )
     {
-    std::cerr << "usage: " << argv[0] << " input output sigmaFactor numberOfIterations" << std::endl;
-    // std::cerr << "  : " << std::endl;
+    std::cerr << "usage: " << argv[0]
+              << " input output sigmaFactor numberOfIterations" << std::endl;
     exit(1);
     }
 

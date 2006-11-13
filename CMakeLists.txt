@@ -76,5 +76,5 @@ ENDIF(BUILD_TESTING)
 #any tests you can comment out or delete the following line.
 # ADD_TEST(Testname ExecutableToRun arg1 arg2 arg3)
 
-ADD_TEST(Run check ${INPUT_IMAGE} out.png)
+ADD_TEST(Run check ${INPUT_IMAGE} out.png 3 30)
 ADD_TEST(CompareImage ${IMAGE_COMPARE} out.png ${CMAKE_SOURCE_DIR}/images/test.png)

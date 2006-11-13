@@ -76,13 +76,66 @@ are trying to find a threshold which maximize the separation of (at least) two m
 the histogram, and so are often performing badely when one mode is largely over represented
 compared to the other.
 
-
 \begin{figure}[htbp]
 \centering
 \includegraphics{histogram}
 \caption{Histogram of an image mainly composed of background pixels.\label{histogram}}
 \end{figure}
 
+Kappa-Sigma clipping use an other approach: it found the mean and sigma of the background, and
+use this two properties to select the pixels significantly different of the background.
+Mean and sigma are first computed on the entire image, and a threshold is computed as \verb$mean + f * sigma$.
+This threshold is then used to select the background, and recompute a new threshold with only
+pixels in the background.
+This algorithm shouldn't converge to a value, so the number of iterations must be provided.
+In general, two iterations are used.
+
+\section{Code example}
+
+\small \begin{verbatim}
+#include "itkImageFileReader.h"
+#include "itkImageFileWriter.h"
+#include "itkSimpleFilterWatcher.h"
+
+#include "itkKappaSigmaThresholdImageFilter.h"
+
+
+int main(int argc, char * argv[])
+{
+
+  if( argc != 5 )
+    {
+    std::cerr << "usage: " << argv[0]
+              << " input output sigmaFactor numberOfIterations" << std::endl;
+    exit(1);
+    }
+
+  const int dim = 3;
+  
+  typedef unsigned char PType;
+  typedef itk::Image< PType, dim > IType;
+
+  typedef itk::ImageFileReader< IType > ReaderType;
+  ReaderType::Pointer reader = ReaderType::New();
+  reader->SetFileName( argv[1] );
+
+  typedef itk::KappaSigmaThresholdImageFilter< IType > FilterType;
+  FilterType::Pointer filter = FilterType::New();
+  filter->SetInput( reader->GetOutput() );
+  filter->SetSigmaFactor( atof(argv[3]) );
+  filter->SetNumberOfIterations( atoi(argv[4]) );
+
+  itk::SimpleFilterWatcher watcher(filter, "filter");
+
+  typedef itk::ImageFileWriter< IType > WriterType;
+  WriterType::Pointer writer = WriterType::New();
+  writer->SetInput( filter->GetOutput() );
+  writer->SetFileName( argv[2] );
+  writer->Update();
+
+  return 0;
+}
+\end{verbatim} \normalsize
 
 % \url{http://www.itk.org}
 % \code{Insight/Documentation/Style.pdf}
