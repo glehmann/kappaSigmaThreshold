@@ -3,20 +3,20 @@
 #include "itkCommand.h"
 #include "itkSimpleFilterWatcher.h"
 
-#include "itkImageFilter.h"
+#include "itkKappaSigmaThresholdImageFilter.h"
 
 
 int main(int argc, char * argv[])
 {
 
-  if( argc !=  )
+  if( argc != 5 )
     {
-    std::cerr << "usage: " << argv[0] << " " << std::endl;
+    std::cerr << "usage: " << argv[0] << " input output sigmaFactor numberOfIterations" << std::endl;
     // std::cerr << "  : " << std::endl;
     exit(1);
     }
 
-  const int dim = 2;
+  const int dim = 3;
   
   typedef unsigned char PType;
   typedef itk::Image< PType, dim > IType;
@@ -25,9 +25,11 @@ int main(int argc, char * argv[])
   ReaderType::Pointer reader = ReaderType::New();
   reader->SetFileName( argv[1] );
 
-  typedef itk::ImageFilter< IType, IType > FilterType;
+  typedef itk::KappaSigmaThresholdImageFilter< IType > FilterType;
   FilterType::Pointer filter = FilterType::New();
   filter->SetInput( reader->GetOutput() );
+  filter->SetSigmaFactor( atof(argv[3]) );
+  filter->SetNumberOfIterations( atoi(argv[4]) );
 
   itk::SimpleFilterWatcher watcher(filter, "filter");
 
