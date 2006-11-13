@@ -55,26 +55,41 @@ Reproduction, Jouy en Josas, F-78350, France}
 
 \begin{abstract}
 \noindent
-When an image is mostly composed of background pixels, most of the automatic
-thresholding methods are failing to produce a relevant threshold. This is mainly
-caused because one mode is over represented compared to the other in the histogram
-of the image. The Kappa-Sigma clipping, a method largely used in astronomy, don't
-try to separate 2 modes in the histogram, but rather try to find the properties of
-the only usable mode, the one of the background, and compute a threshold to select
-the values significantly different of the background.
+%When an image is mostly composed of background pixels, most of the automatic
+%thresholding methods are failing to produce a relevant threshold. This is mainly
+%caused because one mode is over represented compared to the other in the histogram
+%of the image. The Kappa-Sigma clipping, a method largely used in astronomy, don't
+%try to separate 2 modes in the histogram, but rather try to find the properties of
+%the only usable mode, the one of the background, and compute a threshold to select
+%the values significantly different of the background.
+
+Most automatic thresholding methods fail when an image is mostly
+composed of background pixels because the background mode
+dominates. Kappa-Sigma clipping, a method used in astronomy, attempts
+to compute a threshold based on properties of the dominant mode
+rather than attempting to separate two modes.
 \end{abstract}
 
 % \tableofcontents
 
 \section{Description}
-The images mostly formed of background pixels are not so common in biological 2D images.
-However, the third dimension make this case a lot more common, and it's not rare to
-have some images produced by a laser scanning confocal microscope which contain more than 90\%
-of background pixels. The histogram of those images often appear to be mono-modal, as
-the one shown in Figure~\ref{histogram}. The classical automatic thresholding methods
-are trying to find a threshold which maximize the separation of (at least) two modes in
-the histogram, and so are often performing badely when one mode is largely over represented
-compared to the other.
+%Images mostly formed of background pixels are not so common in biological 2D images.
+%However, the third dimension make this case a lot more common, and it's not rare to
+%have some images produced by a laser scanning confocal microscope which contain more than 90\%
+%of background pixels. The histogram of those images often appear to be mono-modal, as
+%the one shown in Figure~\ref{histogram}. The classical automatic thresholding methods
+%are trying to find a threshold which maximize the separation of (at least) two modes in
+%the histogram, and so are often performing badly when one mode is largely over represented
+%compared to the other.
+
+In 3D biological imaging modalities, such as laser scanning confocal
+microscopy, the background is typically the dominant mode. Histograms
+of such images often appear mono-modal, as shown in
+Figure~\ref{histogram}, with 90\% or more of the pixels coming from a
+background class. Classical automatic thresholding methods attempt to
+find a threshold that maximizes separation of two or more modes in a
+histogram and therefore tend to perform poorly when one mode
+dominates.
 
 \begin{figure}[htbp]
 \centering
@@ -82,13 +97,15 @@ compared to the other.
 \caption{Histogram of an image mainly composed of background pixels.\label{histogram}}
 \end{figure}
 
-Kappa-Sigma clipping use an other approach: it found the mean and sigma of the background, and
-use this two properties to select the pixels significantly different of the background.
-Mean and sigma are first computed on the entire image, and a threshold is computed as \verb$mean + f * sigma$.
-This threshold is then used to select the background, and recompute a new threshold with only
-pixels in the background.
-This algorithm shouldn't converge to a value, so the number of iterations must be provided.
-In general, two iterations are used.
+Kappa-Sigma clipping uses another approach: it estimates the mean and
+sigma of the background, and uses these two properties to select
+pixels that differ significantly from the background.  Mean and sigma
+are first computed on the entire image, and a threshold is computed as
+\verb$mean + f * sigma$.  This threshold is then used to select the
+background, and recompute a new threshold with only pixels in the
+background.  This algorithm shouldn't converge to a value, so the
+number of iterations must be provided.  In general, two iterations are
+used.
 
 \section{Code example}
 
