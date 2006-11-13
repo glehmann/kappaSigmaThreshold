@@ -33,16 +33,17 @@ colorlinks,linkcolor={blue},citecolor={blue},urlcolor={blue},
 
 % The title should be descriptive enough for people to be able to find
 % the relevant document. 
-\title{}
+\title{Kappa Sigma Clipping}
 
 % Increment the release number whenever significant changes are made.
 % The author and/or editor can define 'significant' however they like.
-\release{0.00}
+% \release{0.00}
 
 % At minimum, give your name and an email address.  You can include a
 % snail-mail address if you like.
-\author{}
-\authoraddress{}
+\author{Ga\"etan Lehmann}
+\authoraddress{INRA, UMR 1198; ENVA; CNRS, FRE 2857, Biologie du D\'eveloppement et
+Reproduction, Jouy en Josas, F-78350, France}
 
 \begin{document}
 \maketitle
@@ -54,11 +55,33 @@ colorlinks,linkcolor={blue},citecolor={blue},urlcolor={blue},
 
 \begin{abstract}
 \noindent
-% The abstract should be a paragraph or two long, and describe the
-% scope of the document.
+When an image is mostly composed of background pixels, most of the automatic
+thresholding methods are failing to produce a relevant threshold. This is mainly
+caused because one mode is over represented compared to the other in the histogram
+of the image. The Kappa-Sigma clipping, a method largely used in astronomy, don't
+try to separate 2 modes in the histogram, but rather try to find the properties of
+the only usable mode, the one of the background, and compute a threshold to select
+the values significantly different of the background.
 \end{abstract}
 
-\tableofcontents
+% \tableofcontents
+
+\section{Description}
+The images mostly formed of background pixels are not so common in biological 2D images.
+However, the third dimension make this case a lot more common, and it's not rare to
+have some images produced by a laser scanning confocal microscope which contain more than 90\%
+of background pixels. The histogram of those images often appear to be mono-modal, as
+the one shown in Figure~\ref{histogram}. The classical automatic thresholding methods
+are trying to find a threshold which maximize the separation of (at least) two modes in
+the histogram, and so are often performing badely when one mode is largely over represented
+compared to the other.
+
+
+\begin{figure}[htbp]
+\centering
+\includegraphics{histogram}
+\caption{Histogram of an image mainly composed of background pixels.\label{histogram}}
+\end{figure}
 
 
 % \url{http://www.itk.org}
@@ -80,11 +103,11 @@ colorlinks,linkcolor={blue},citecolor={blue},urlcolor={blue},
 
 % \ref{cthead1}
 
-\begin{figure}[htbp]
-\centering
-\includegraphics{cthead1}
-\caption{The input image.\label{cthead1}}
-\end{figure}
+% \begin{figure}[htbp]
+% \centering
+% \includegraphics{cthead1}
+% \caption{The input image.\label{cthead1}}
+% \end{figure}
 
 
 \appendix
