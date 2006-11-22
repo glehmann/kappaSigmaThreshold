@@ -60,9 +60,11 @@ KappaSigmaThresholdImageFilter<TInputImage, TMaskImage, TOutputImage>
   progress->RegisterInternalFilter(threshold,.5f);
   threshold->GraftOutput (this->GetOutput());
   threshold->SetInput (this->GetInput());
-  threshold->SetLowerThreshold( m_Threshold );
-  threshold->SetInsideValue (m_InsideValue);
-  threshold->SetOutsideValue (m_OutsideValue);
+  // the value we get is in the background, and so must not be considered
+  // as foreground by the threshold filter
+  threshold->SetUpperThreshold( m_Threshold );
+  threshold->SetOutsideValue (m_InsideValue);
+  threshold->SetInsideValue (m_OutsideValue);
   threshold->Update();
 
   this->GraftOutput(threshold->GetOutput());
