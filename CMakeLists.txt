@@ -66,6 +66,10 @@ SET(CurrentExe "check")
 ADD_EXECUTABLE(${CurrentExe} ${CurrentExe}.cxx)
 TARGET_LINK_LIBRARIES(${CurrentExe} ${Libraries})
 
+SET(CurrentExe "checkMask")
+ADD_EXECUTABLE(${CurrentExe} ${CurrentExe}.cxx)
+TARGET_LINK_LIBRARIES(${CurrentExe} ${Libraries})
+
 ENDIF(BUILD_TESTING)
 
 #the following line is an example of how to add a test to your project.
@@ -78,3 +82,6 @@ ENDIF(BUILD_TESTING)
 
 ADD_TEST(Run check ${INPUT_IMAGE} out.png 3 30)
 ADD_TEST(CompareImage ${IMAGE_COMPARE} out.png ${CMAKE_SOURCE_DIR}/images/test.png)
+
+ADD_TEST(RunMask checkMask ${INPUT_IMAGE} ${CMAKE_SOURCE_DIR}/images/test.png maskout.png 3 30)
+ADD_TEST(CompareImageMask ${IMAGE_COMPARE} maskout.png ${CMAKE_SOURCE_DIR}/images/maskout.png)
