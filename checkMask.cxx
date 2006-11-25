@@ -33,8 +33,9 @@ int main(int argc, char * argv[])
   filter->SetMaskImage( reader2->GetOutput() );
   filter->SetSigmaFactor( atof(argv[4]) );
   filter->SetNumberOfIterations( atoi(argv[5]) );
+  filter->SetNumberOfHistogramBins( 256 );
 
-  itk::SimpleFilterWatcher watcher(filter, "filter");
+  // itk::SimpleFilterWatcher watcher(filter, "filter");
 
   typedef itk::ImageFileWriter< IType > WriterType;
   WriterType::Pointer writer = WriterType::New();

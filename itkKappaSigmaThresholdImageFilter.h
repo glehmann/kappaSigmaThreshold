@@ -19,6 +19,7 @@
 
 #include "itkImageToImageFilter.h"
 #include "itkKappaSigmaThresholdCalculator.h"
+#include "itkScalarImageToHistogramGenerator.h"
 
 namespace itk {
 
@@ -78,7 +79,10 @@ public:
   typedef typename TOutputImage::IndexType  OutputIndexType;
   typedef typename TOutputImage::RegionType OutputImageRegionType;
 
-  typedef KappaSigmaThresholdCalculator< TInputImage, TMaskImage > CalculatorType;
+  typedef itk::Statistics::ScalarImageToHistogramGenerator< 
+                                           TInputImage > HistogramGeneratorType;
+  typedef typename HistogramGeneratorType::HistogramType HistogramType;
+  typedef KappaSigmaThresholdCalculator< HistogramType > CalculatorType;
   
   /** Image related typedefs. */
   itkStaticConstMacro(InputImageDimension, unsigned int,
@@ -111,6 +115,10 @@ public:
 
   itkSetMacro(NumberOfIterations, unsigned int);
   itkGetMacro(NumberOfIterations, unsigned int);
+
+  /** Set/Get the number of histogram bins. Default is 128. */
+  itkSetClampMacro( NumberOfHistogramBins, unsigned long, 1, NumericTraits<unsigned long>::max() );
+  itkGetConstMacro( NumberOfHistogramBins, unsigned long );
 
 #ifdef ITK_USE_CONCEPT_CHECKING
   /** Begin concept checking */
@@ -165,6 +173,7 @@ private:
   InputPixelType      m_Threshold;
   OutputPixelType     m_InsideValue;
   OutputPixelType     m_OutsideValue;
+  unsigned long       m_NumberOfHistogramBins;
 
 
 } ; // end of class

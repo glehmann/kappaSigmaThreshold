@@ -3,8 +3,8 @@
   Program:   Insight Segmentation & Registration Toolkit
   Module:    $RCSfile: itkKappaSigmaThresholdCalculator.h,v $
   Language:  C++
-  Date:      $Date: 2004/04/25 23:59:26 $
-  Version:   $Revision: 1.37 $
+  Date:      $Date: 2005/11/25 15:50:35 $
+  Version:   $Revision: 1.4 $
 
   Copyright (c) Insight Software Consortium. All rights reserved.
   See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
@@ -17,76 +17,54 @@
 #ifndef __itkKappaSigmaThresholdCalculator_h
 #define __itkKappaSigmaThresholdCalculator_h
 
-#include "itkMacro.h"
-#include "itkImage.h"
+#include "itkHistogramAlgorithmBase.h"
+#include "itkHistogram.h"
 
 namespace itk
 {
 
 /** \class KappaSigmaThresholdCalculator
- * \brief Compute moments of an n-dimensional image.
+ * \brief Computes Otsu's thresholds for a histogram.
+ * 
+ * You plug in the target histogram using SetInputHistogram method and 
+ * specify the number of thresholds you want to be computed. Then call
+ * the GenerateData method to run the alogithm. 
  *
+ * The thresholds are computed so that the between-class variance is
+ * maximized.
  *
- * \ingroup Operators
- *
- * \todo It's not yet clear how multi-echo images should be handled here.
+ * \ingroup Calculators
  */
-template < class TInputImage, class TMaskImage >
-class ITK_EXPORT KappaSigmaThresholdCalculator : public Object
+
+template< class TInputHistogram >
+class KappaSigmaThresholdCalculator :
+      public HistogramAlgorithmBase< TInputHistogram >
 {
 public:
-  /** Standard class typedefs. */
+  /**Standard class typedefs. */
   typedef KappaSigmaThresholdCalculator Self;
-  typedef Object Superclass;
+  typedef HistogramAlgorithmBase<TInputHistogram> Superclass;
   typedef SmartPointer<Self> Pointer;
   typedef SmartPointer<const Self> ConstPointer;
 
-  /** Method for creation through the object factory. */
-  itkNewMacro(Self);
+  typedef typename TInputHistogram::MeasurementType MeasurementType;
+  typedef typename TInputHistogram::FrequencyType FrequencyType;
 
-  /** Run-time type information (and related methods). */
-  itkTypeMacro(KappaSigmaThresholdCalculator, Object);
+  typedef typename NumericTraits<MeasurementType>::RealType MeanType;
+  typedef typename NumericTraits<MeasurementType>::RealType VarianceType;
 
-  /** Extract the dimension of the image. */
-  itkStaticConstMacro(ImageDimension, unsigned int,
-                      TInputImage::ImageDimension);
+  typedef std::vector<MeanType> MeanVectorType;
+  typedef std::vector<FrequencyType> FrequencyVectorType;
 
-  /** Standard image type within this class. */
-  typedef TInputImage InputImageType;
-  typedef TMaskImage MaskImageType;
+  typedef typename TInputHistogram::InstanceIdentifier InstanceIdentifierType;
+  typedef std::vector<InstanceIdentifierType> InstanceIdentifierVectorType;
 
-  /** Standard image type pointer within this class. */
-  typedef typename InputImageType::Pointer InputImagePointer;
-  typedef typename InputImageType::ConstPointer InputImageConstPointer;
-  typedef typename MaskImageType::Pointer MaskImagePointer;
-  typedef typename MaskImageType::ConstPointer MaskImageConstPointer;
+  /**Standard Macros */
+  itkTypeMacro(KappaSigmaThresholdCalculator, HistogramAlgorithmsBase);
+  itkNewMacro(Self) ;
 
-  typedef typename InputImageType::PixelType InputPixelType;
-  typedef typename MaskImageType::PixelType MaskPixelType;
-
-  /** Set the input image. */
-  virtual void SetInput( const InputImageType * image )
-    {
-    if ( m_Input != image )
-      {
-      m_Input = image;
-      this->Modified();
-      m_Valid = false;
-      }
-    }
-
-  virtual void SetMask( const MaskImageType * image )
-    {
-    if ( m_Mask != image )
-      {
-      m_Mask = image;
-      this->Modified();
-      m_Valid = false;
-      }
-    }
-
-  itkSetMacro(MaskValue, MaskPixelType);
-  itkGetMacro(MaskValue, MaskPixelType);
+  /** Returns the threshold */
+  itkGetConstMacro( Output, MeasurementType );
 
   itkSetMacro(SigmaFactor, double);
   itkGetMacro(SigmaFactor, double);
@@ -94,40 +72,26 @@ public:
   itkSetMacro(NumberOfIterations, unsigned int);
   itkGetMacro(NumberOfIterations, unsigned int);
 
-  /** Compute moments of a new or modified image.
-   * This method computes the moments of the image given as a
-   * parameter and stores them in the object.  The values of these
-   * moments and related parameters can then be retrieved by using
-   * other methods of this object. */
-  void Compute( void );
-  
-  const InputPixelType & GetOutput() const;
-
 protected:
   KappaSigmaThresholdCalculator();
   virtual ~KappaSigmaThresholdCalculator() {};
   void PrintSelf(std::ostream& os, Indent indent) const;
 
-private:
-  KappaSigmaThresholdCalculator(const Self&); //purposely not implemented
-  void operator=(const Self&); //purposely not implemented
+  /** Calculates the thresholds and save them */
+  void GenerateData() ;
 
-  bool m_Valid;                      // Have moments been computed yet?
-  MaskPixelType m_MaskValue;
+private:
+  /** Internal thresholds storage */
+  MeasurementType m_Output ;
   double m_SigmaFactor;
   unsigned int m_NumberOfIterations;
-  InputPixelType m_Output;
 
-  InputImageConstPointer m_Input;
-  MaskImageConstPointer m_Mask;
+} ; // end of class
 
-};  // class KappaSigmaThresholdCalculator
-
-} // end namespace itk
-
+} // end of namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
 #include "itkKappaSigmaThresholdCalculator.txx"
 #endif
 
-#endif /* __itkKappaSigmaThresholdCalculator_h */
+#endif

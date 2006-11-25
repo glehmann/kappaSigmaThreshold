@@ -29,8 +29,9 @@ int main(int argc, char * argv[])
   filter->SetInput( reader->GetOutput() );
   filter->SetSigmaFactor( atof(argv[3]) );
   filter->SetNumberOfIterations( atoi(argv[4]) );
+  filter->SetNumberOfHistogramBins( 256 );
 
-  itk::SimpleFilterWatcher watcher(filter, "filter");
+  // itk::SimpleFilterWatcher watcher(filter, "filter");
 
   typedef itk::ImageFileWriter< IType > WriterType;
   WriterType::Pointer writer = WriterType::New();

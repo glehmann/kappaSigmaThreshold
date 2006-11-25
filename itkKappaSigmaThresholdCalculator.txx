@@ -3,8 +3,8 @@
   Program:   Insight Segmentation & Registration Toolkit
   Module:    $RCSfile: itkKappaSigmaThresholdCalculator.txx,v $
   Language:  C++
-  Date:      $Date: 2005/08/10 16:32:57 $
-  Version:   $Revision: 1.52 $
+  Date:      $Date: 2005/01/13 15:36:46 $
+  Version:   $Revision: 1.4 $
 
   Copyright (c) Insight Software Consortium. All rights reserved.
   See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
@@ -16,107 +16,88 @@
 =========================================================================*/
 #ifndef _itkKappaSigmaThresholdCalculator_txx
 #define _itkKappaSigmaThresholdCalculator_txx
+
 #include "itkKappaSigmaThresholdCalculator.h"
 
-#include "itkImageRegionConstIteratorWithIndex.h"
-#include "itkImageRegionConstIterator.h"
-
 namespace itk
-{ 
-
-
-
-template < class TInputImage, class TMaskImage >
-KappaSigmaThresholdCalculator<TInputImage, TMaskImage>
-::KappaSigmaThresholdCalculator(void) 
 {
-  m_Valid = false;
-  m_Input = NULL;
-  m_Mask = NULL;
-  m_MaskValue = NumericTraits< MaskPixelType >::max();
-  m_Output = NumericTraits< InputPixelType >::Zero;
+
+
+template<class TInputHistogram>
+KappaSigmaThresholdCalculator<TInputHistogram>
+::KappaSigmaThresholdCalculator() 
+{
   m_SigmaFactor = 2;
   m_NumberOfIterations = 2;
 }
 
 
-template < class TInputImage, class TMaskImage >
+/*
+ * Compute Otsu's thresholds
+ */                    
+template<class TInputHistogram>
 void
-KappaSigmaThresholdCalculator<TInputImage, TMaskImage>
-::PrintSelf( std::ostream& os, Indent indent ) const
-{
-  Superclass::PrintSelf(os,indent);
-  os << indent << "Input: " << m_Input.GetPointer() << std::endl;
-  os << indent << "Mask: " << m_Mask.GetPointer() << std::endl;
-  os << indent << "Valid: " << m_Valid << std::endl;
-  os << indent << "MaskValue: " << m_MaskValue << std::endl;
-  os << indent << "SigmaFactor: " << m_SigmaFactor << std::endl;
-  os << indent << "NumberOfIterations: " << m_NumberOfIterations << std::endl;
-  os << indent << "Output: " << m_Output << std::endl;
-}
-
-
-template < class TInputImage, class TMaskImage >
-void
-KappaSigmaThresholdCalculator<TInputImage, TMaskImage>
-::Compute()
+KappaSigmaThresholdCalculator<TInputHistogram>
+::GenerateData()
 {
 
-  typedef typename InputImageType::IndexType IndexType;
+  typename TInputHistogram::ConstPointer histogram = this->GetInputHistogram();
 
-  if( !m_Input ) 
+  // TODO: as an improvement, the class could accept multi-dimensional histograms
+  // and the user could specify the dimension to apply the algorithm to.
+  if (histogram->GetSize().GetSizeDimension() != 1)
     {
-    return;
+    itkExceptionMacro(<<"Histogram must be 1-dimensional.");
     }
-    
+
   // init the values
-  InputPixelType threshold = NumericTraits< InputPixelType >::max(); // use all the pixels to begin
+  double threshold = histogram->GetMeasurementVector( histogram->Size() - 1 )[0]; // use all the pixels to begin
   unsigned long count0 = 0;
+  // to avoid itertion over all the histogram at each iteration, and avoid testing that the value is
+  // smaller than the threshold for all values in the histogram
+  unsigned int startingIndex = histogram->Size() - 1;
 
   for( unsigned int iteration = 0; iteration < m_NumberOfIterations ; iteration++ )
     {
-    ImageRegionConstIteratorWithIndex< InputImageType > iIt( m_Input,
-                                                      m_Input->GetRequestedRegion() ); 
-
-    // compute the mean
-    iIt.GoToBegin();
-    unsigned long count = 0;
-    double mean = 0;
-    while( !iIt.IsAtEnd() )
+    
+    // decrease the starting index to find the right starting index
+    while( histogram->GetMeasurementVector( startingIndex )[0] > threshold )
       {
-      if( !m_Mask || m_Mask->GetPixel( iIt.GetIndex() ) == m_MaskValue )
+      startingIndex--;
+      }
+    
+    // compute the mean
+    double count = 0;
+    double mean = 0;
+    for( unsigned long i=0; i<=startingIndex; i++)
+      {
+      const MeasurementType & v = histogram->GetMeasurementVector( i )[0];
+      const double & freq = histogram->GetFrequency( i );
+      if( v <= threshold )
         {
-        const InputPixelType & v = iIt.Get();
-        if( v <= threshold )
-          {
-          mean += v;
-          count++;
-          }
+        mean += v * freq;
+        count += freq;
         }
-      ++iIt;
       }
     mean = mean / count;
-
+    
     // compute sigma
-    iIt.GoToBegin();
     double sigma = 0;
-    while( !iIt.IsAtEnd() )
+    for( unsigned long i=0; i<=startingIndex; i++)
       {
-      if( !m_Mask || m_Mask->GetPixel( iIt.GetIndex() ) == m_MaskValue )
+      const MeasurementType & v = histogram->GetMeasurementVector( i )[0];
+      const double & freq = histogram->GetFrequency( i );
+      if( v <= threshold )
         {
-        const InputPixelType & v = iIt.Get();
-        if( v <= threshold )
-          {
-          sigma += vnl_math_sqr( v - mean );
-          }
+        sigma += vnl_math_sqr( v - mean ) * freq;
         }
-      ++iIt;
       }
-    sigma = vcl_sqrt( sigma / ( count - 1) );
-
+     sigma = vcl_sqrt( sigma / ( count - 1) );
+   
+    
     // compute the threshold for the next iteration
-    InputPixelType newThreshold = static_cast< InputPixelType >( mean + m_SigmaFactor * sigma );
-    if( newThreshold == threshold )
+    MeasurementType newThreshold = static_cast< MeasurementType >( mean + m_SigmaFactor * sigma );
+    if( newThreshold >= threshold )
       {
       // no need to continue - the threshold is the same and will produce the same result
       break;
@@ -128,30 +109,25 @@ KappaSigmaThresholdCalculator<TInputImage, TMaskImage>
       count0 = count;
       }
   
-    // std::cout << "ratio: " << count/(float)count0 << "  mean: " << mean << "  sigma: " << sigma << "  threshold: " << threshold+0.0 << std::endl;
+    std::cout << "ratio: " << count/(float)count0 << "  mean: " << mean << "  sigma: " << sigma << "  threshold: " << threshold+0.0 << std::endl;
     }
 
   m_Output = threshold;
-  m_Valid = true;
 
 }
 
-
-
-template < class TInputImage, class TMaskImage >
-const typename KappaSigmaThresholdCalculator<TInputImage, TMaskImage>::InputPixelType &
-KappaSigmaThresholdCalculator<TInputImage, TMaskImage>
-::GetOutput() const
+template<class TInputHistogram>
+void
+KappaSigmaThresholdCalculator<TInputHistogram>
+::PrintSelf(std::ostream& os, Indent indent) const
 {
-  if (!m_Valid)
-    {
-    itkExceptionMacro( << "GetOutput() invoked, but the output have not been computed. Call Compute() first.");
-    }
-  return m_Output;
+  Superclass::PrintSelf(os,indent);
+  os << indent << "Output: " << static_cast<typename NumericTraits<MeasurementType>::PrintType>(m_Output) << std::endl;
+  os << indent << "SigmaFactor: " << m_SigmaFactor << std::endl;
+  os << indent << "NumberOfIterations: " << m_NumberOfIterations << std::endl;
+
 }
 
 } // end namespace itk
-
-
 
 #endif

@@ -33,6 +33,7 @@ KappaSigmaThresholdImageFilter<TInputImage, TMaskImage, TOutputImage>
   m_SigmaFactor = 2;
   m_NumberOfIterations = 2;
   m_MaskValue = NumericTraits<MaskPixelType>::max();
+  m_NumberOfHistogramBins = 128;
 }
 
 template<class TInputImage, class TMaskImage, class TOutputImage>
@@ -43,14 +44,21 @@ KappaSigmaThresholdImageFilter<TInputImage, TMaskImage, TOutputImage>
   typename ProgressAccumulator::Pointer progress = ProgressAccumulator::New();
   progress->SetMiniPipelineFilter(this);
 
+  // Create a histogram of the image intensities
+  typename HistogramGeneratorType::Pointer histogramGenerator = HistogramGeneratorType::New();
+  histogramGenerator->SetInput(  this->GetInput()  );
+  histogramGenerator->SetMaskImage( this->GetMaskImage()  );
+  histogramGenerator->SetMaskValue( m_MaskValue );
+  histogramGenerator->SetNumberOfBins( m_NumberOfHistogramBins );
+  // progress->RegisterInternalFilter(histogramGenerator,.5f);
+  histogramGenerator->Compute();
+
   // Compute the Threshold for the input image
   typename CalculatorType::Pointer thresholdCalculator = CalculatorType::New();
-  thresholdCalculator->SetInput( this->GetInput() );
-  thresholdCalculator->SetMask( this->GetMaskImage() );
-  thresholdCalculator->SetMaskValue( m_MaskValue );
+  thresholdCalculator->SetInputHistogram( histogramGenerator->GetOutput() );
   thresholdCalculator->SetSigmaFactor( m_SigmaFactor );
   thresholdCalculator->SetNumberOfIterations( m_NumberOfIterations );
-  thresholdCalculator->Compute();
+  thresholdCalculator->Update();
 
   m_Threshold = thresholdCalculator->GetOutput();
 

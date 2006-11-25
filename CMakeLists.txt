@@ -2,7 +2,7 @@
 PROJECT(kappaSigmaClipping)
 
 # set the name of the input image used to run the test
-SET(INPUT_IMAGE ${CMAKE_SOURCE_DIR}/images/cthead1.png)
+SET(INPUT_IMAGE ${CMAKE_SOURCE_DIR}/images/emb-09ZOOM.tif)
 
 #include some macros from another file...
 INCLUDE(IJMacros.txt)
@@ -32,6 +32,7 @@ SET(Libraries
   ITKCommon
   ITKBasicFilters
   ITKIO
+  ITKStatistics
 )
 
 
@@ -80,8 +81,8 @@ ENDIF(BUILD_TESTING)
 #any tests you can comment out or delete the following line.
 # ADD_TEST(Testname ExecutableToRun arg1 arg2 arg3)
 
-ADD_TEST(Run check ${INPUT_IMAGE} out.png 3 30)
-ADD_TEST(CompareImage ${IMAGE_COMPARE} out.png ${CMAKE_SOURCE_DIR}/images/test.png)
+ADD_TEST(Run check ${INPUT_IMAGE} out.tif 3 30)
+ADD_TEST(CompareImage ${IMAGE_COMPARE} out.tif ${CMAKE_SOURCE_DIR}/images/out.tif)
 
-ADD_TEST(RunMask checkMask ${INPUT_IMAGE} ${CMAKE_SOURCE_DIR}/images/test.png maskout.png 3 30)
+ADD_TEST(RunMask checkMask ${CMAKE_SOURCE_DIR}/images/cthead1.png ${CMAKE_SOURCE_DIR}/images/test.png maskout.png 2 30)
 ADD_TEST(CompareImageMask ${IMAGE_COMPARE} maskout.png ${CMAKE_SOURCE_DIR}/images/maskout.png)
