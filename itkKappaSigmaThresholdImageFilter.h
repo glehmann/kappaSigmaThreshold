@@ -110,8 +110,8 @@ public:
   itkSetMacro(MaskValue, MaskPixelType);
   itkGetMacro(MaskValue, MaskPixelType);
 
-  itkSetMacro(SigmaFactor, double);
-  itkGetMacro(SigmaFactor, double);
+  itkSetMacro(Kappa, double);
+  itkGetMacro(Kappa, double);
 
   itkSetMacro(NumberOfIterations, unsigned int);
   itkGetMacro(NumberOfIterations, unsigned int);
@@ -168,7 +168,7 @@ private:
   void operator=(const Self&); //purposely not implemented
 
   MaskPixelType m_MaskValue;
-  double m_SigmaFactor;
+  double m_Kappa;
   unsigned int m_NumberOfIterations;
   InputPixelType      m_Threshold;
   OutputPixelType     m_InsideValue;

@@ -30,7 +30,7 @@ KappaSigmaThresholdImageFilter<TInputImage, TMaskImage, TOutputImage>
   m_OutsideValue   = NumericTraits<OutputPixelType>::Zero;
   m_InsideValue    = NumericTraits<OutputPixelType>::max();
   m_Threshold      = NumericTraits<InputPixelType>::Zero;
-  m_SigmaFactor = 2;
+  m_Kappa = 2;
   m_NumberOfIterations = 2;
   m_MaskValue = NumericTraits<MaskPixelType>::max();
   m_NumberOfHistogramBins = 128;
@@ -56,7 +56,7 @@ KappaSigmaThresholdImageFilter<TInputImage, TMaskImage, TOutputImage>
   // Compute the Threshold for the input image
   typename CalculatorType::Pointer thresholdCalculator = CalculatorType::New();
   thresholdCalculator->SetInputHistogram( histogramGenerator->GetOutput() );
-  thresholdCalculator->SetSigmaFactor( m_SigmaFactor );
+  thresholdCalculator->SetKappa( m_Kappa );
   thresholdCalculator->SetNumberOfIterations( m_NumberOfIterations );
   thresholdCalculator->Update();
 
@@ -95,7 +95,7 @@ KappaSigmaThresholdImageFilter<TInputImage, TMaskImage, TOutputImage>
 
   os << indent << "Threshold: " << static_cast<typename NumericTraits<InputPixelType>::PrintType>(m_Threshold) << std::endl;
   os << indent << "MaskValue: " << static_cast<typename NumericTraits<MaskPixelType>::PrintType>(m_MaskValue) << std::endl;
-  os << indent << "SigmaFactor: " << m_SigmaFactor << std::endl;
+  os << indent << "Kappa: " << m_Kappa << std::endl;
   os << indent << "NumberOfIterations: " << m_NumberOfIterations << std::endl;
 }
 

@@ -31,7 +31,7 @@ int main(int argc, char * argv[])
   FilterType::Pointer filter = FilterType::New();
   filter->SetInput( reader->GetOutput() );
   filter->SetMaskImage( reader2->GetOutput() );
-  filter->SetSigmaFactor( atof(argv[4]) );
+  filter->SetKappa( atof(argv[4]) );
   filter->SetNumberOfIterations( atoi(argv[5]) );
   filter->SetNumberOfHistogramBins( 256 );
 

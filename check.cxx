@@ -27,7 +27,7 @@ int main(int argc, char * argv[])
   typedef itk::KappaSigmaThresholdImageFilter< IType > FilterType;
   FilterType::Pointer filter = FilterType::New();
   filter->SetInput( reader->GetOutput() );
-  filter->SetSigmaFactor( atof(argv[3]) );
+  filter->SetKappa( atof(argv[3]) );
   filter->SetNumberOfIterations( atoi(argv[4]) );
   filter->SetNumberOfHistogramBins( 256 );
 

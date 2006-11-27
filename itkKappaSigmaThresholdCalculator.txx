@@ -27,7 +27,7 @@ template<class TInputHistogram>
 KappaSigmaThresholdCalculator<TInputHistogram>
 ::KappaSigmaThresholdCalculator() 
 {
-  m_SigmaFactor = 2;
+  m_Kappa = 2;
   m_NumberOfIterations = 2;
 }
 
@@ -96,7 +96,7 @@ KappaSigmaThresholdCalculator<TInputHistogram>
    
     
     // compute the threshold for the next iteration
-    MeasurementType newThreshold = static_cast< MeasurementType >( mean + m_SigmaFactor * sigma );
+    MeasurementType newThreshold = static_cast< MeasurementType >( mean + m_Kappa * sigma );
     if( newThreshold >= threshold )
       {
       // no need to continue - the threshold is the same and will produce the same result
@@ -123,7 +123,7 @@ KappaSigmaThresholdCalculator<TInputHistogram>
 {
   Superclass::PrintSelf(os,indent);
   os << indent << "Output: " << static_cast<typename NumericTraits<MeasurementType>::PrintType>(m_Output) << std::endl;
-  os << indent << "SigmaFactor: " << m_SigmaFactor << std::endl;
+  os << indent << "Kappa: " << m_Kappa << std::endl;
   os << indent << "NumberOfIterations: " << m_NumberOfIterations << std::endl;
 
 }

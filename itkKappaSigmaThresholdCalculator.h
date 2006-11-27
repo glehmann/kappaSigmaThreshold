@@ -66,8 +66,8 @@ public:
   /** Returns the threshold */
   itkGetConstMacro( Output, MeasurementType );
 
-  itkSetMacro(SigmaFactor, double);
-  itkGetMacro(SigmaFactor, double);
+  itkSetMacro(Kappa, double);
+  itkGetMacro(Kappa, double);
 
   itkSetMacro(NumberOfIterations, unsigned int);
   itkGetMacro(NumberOfIterations, unsigned int);
@@ -83,7 +83,7 @@ protected:
 private:
   /** Internal thresholds storage */
   MeasurementType m_Output ;
-  double m_SigmaFactor;
+  double m_Kappa;
   unsigned int m_NumberOfIterations;
 
 } ; // end of class
