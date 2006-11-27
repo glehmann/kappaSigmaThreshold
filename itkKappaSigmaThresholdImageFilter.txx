@@ -60,7 +60,7 @@ KappaSigmaThresholdImageFilter<TInputImage, TMaskImage, TOutputImage>
   thresholdCalculator->SetNumberOfIterations( m_NumberOfIterations );
   thresholdCalculator->Update();
 
-  m_Threshold = thresholdCalculator->GetOutput();
+  m_Threshold = static_cast< InputPixelType >( thresholdCalculator->GetOutput() );
 
   typename BinaryThresholdImageFilter<TInputImage,TOutputImage>::Pointer threshold = 
     BinaryThresholdImageFilter<TInputImage,TOutputImage>::New();;

@@ -52,7 +52,7 @@ KappaSigmaThresholdCalculator<TInputHistogram>
 
   // init the values
   double threshold = histogram->GetMeasurementVector( histogram->Size() - 1 )[0]; // use all the pixels to begin
-  unsigned long count0 = 0;
+  double count0 = 0;
   // to avoid itertion over all the histogram at each iteration, and avoid testing that the value is
   // smaller than the threshold for all values in the histogram
   unsigned int startingIndex = histogram->Size() - 1;

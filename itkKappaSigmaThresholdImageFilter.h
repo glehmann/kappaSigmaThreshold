@@ -80,7 +80,7 @@ public:
   typedef typename TOutputImage::RegionType OutputImageRegionType;
 
   typedef itk::Statistics::ScalarImageToHistogramGenerator< 
-                                           TInputImage > HistogramGeneratorType;
+                                           TInputImage, TMaskImage > HistogramGeneratorType;
   typedef typename HistogramGeneratorType::HistogramType HistogramType;
   typedef KappaSigmaThresholdCalculator< HistogramType > CalculatorType;
   
