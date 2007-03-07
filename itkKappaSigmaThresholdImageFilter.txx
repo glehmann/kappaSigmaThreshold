@@ -65,7 +65,10 @@ KappaSigmaThresholdImageFilter<TInputImage, TMaskImage, TOutputImage>
   typename BinaryThresholdImageFilter<TInputImage,TOutputImage>::Pointer threshold = 
     BinaryThresholdImageFilter<TInputImage,TOutputImage>::New();;
   
-  progress->RegisterInternalFilter(threshold,.5f);
+//   progress->RegisterInternalFilter(threshold,.5f);
+  // nor histogramGenerator or thresholdCalculator can report their progress so
+  // pretend that all the work is done by threshold.
+  progress->RegisterInternalFilter(threshold, 1.0f);
   threshold->GraftOutput (this->GetOutput());
   threshold->SetInput (this->GetInput());
   // the value we get is in the background, and so must not be considered
