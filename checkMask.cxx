@@ -35,7 +35,7 @@ int main(int argc, char * argv[])
   filter->SetNumberOfIterations( atoi(argv[5]) );
   filter->SetNumberOfHistogramBins( 256 );
 
-  // itk::SimpleFilterWatcher watcher(filter, "filter");
+  itk::SimpleFilterWatcher watcher(filter, "filter");
 
   typedef itk::ImageFileWriter< IType > WriterType;
   WriterType::Pointer writer = WriterType::New();

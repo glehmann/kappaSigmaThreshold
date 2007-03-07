@@ -56,8 +56,7 @@ KappaSigmaThresholdCalculator<TInputHistogram>
     }
 
   // init the values
-  double threshold = histogram->GetMeasurementVector( histogram->Size() - 1 )[0]; // use all the pixels to begin
-  double count0 = 0;
+  MeasurementType threshold = histogram->GetMeasurementVector( histogram->Size() - 1 )[0]; // use all the pixels to begin
   // to avoid itertion over all the histogram at each iteration, and avoid testing that the value is
   // smaller than the threshold for all values in the histogram
   unsigned int startingIndex = histogram->Size() - 1;
@@ -101,20 +100,16 @@ KappaSigmaThresholdCalculator<TInputHistogram>
    
     
     // compute the threshold for the next iteration
-    MeasurementType newThreshold = static_cast< MeasurementType >( mean + m_Kappa * sigma );
-    if( newThreshold >= threshold )
+    MeasurementType newThreshold = mean + m_Kappa * sigma;
+    // I don't know why, but without the casts, the following test is always false
+    if( (float)newThreshold == (float)threshold )
       {
       // no need to continue - the threshold is the same and will produce the same result
       break;
       }
     threshold = newThreshold;
 
-    if( iteration == 0 )
-      {
-      count0 = count;
-      }
-  
-    std::cout << "ratio: " << count/(float)count0 << "  mean: " << mean << "  sigma: " << sigma << "  threshold: " << threshold+0.0 << std::endl;
+//     std::cout << "ratio: " << count/histogram->GetTotalFrequency() << "  mean: " << mean << "  sigma: " << sigma << "  threshold: " << threshold+0.0 << std::endl;
     }
 
   m_Output = threshold;

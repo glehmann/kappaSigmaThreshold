@@ -181,7 +181,7 @@ ImageToListGenerator< TImage, TMaskImage >
   // TODO: Why don't most other ITK filters that take multiple inputs check
   // for this ? 
   //
-  if (this->GetNumberOfInputs() > 1)
+  if (this->GetMaskImage())
     {
     MaskImageType *maskImage = const_cast< MaskImageType * >(this->GetMaskImage());
     ImageType         *image = const_cast< ImageType * >( this->GetInput() );
