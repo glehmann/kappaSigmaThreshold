@@ -50,6 +50,11 @@ KappaSigmaThresholdCalculator<TInputHistogram>
     itkExceptionMacro(<<"Histogram must be 1-dimensional.");
     }
 
+  if (histogram->GetTotalFrequency() == 0)
+    {
+    itkExceptionMacro(<<"Histogram is empty.");
+    }
+
   // init the values
   double threshold = histogram->GetMeasurementVector( histogram->Size() - 1 )[0]; // use all the pixels to begin
   double count0 = 0;
